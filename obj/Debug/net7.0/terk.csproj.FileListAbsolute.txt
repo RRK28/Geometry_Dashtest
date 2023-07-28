@@ -1,0 +1,15 @@
+/Users/rerrek/Documents/csharp/terk/obj/Debug/net7.0/terk.csproj.AssemblyReference.cache
+/Users/rerrek/Documents/csharp/terk/obj/Debug/net7.0/terk.GeneratedMSBuildEditorConfig.editorconfig
+/Users/rerrek/Documents/csharp/terk/obj/Debug/net7.0/terk.AssemblyInfoInputs.cache
+/Users/rerrek/Documents/csharp/terk/obj/Debug/net7.0/terk.AssemblyInfo.cs
+/Users/rerrek/Documents/csharp/terk/obj/Debug/net7.0/terk.csproj.CoreCompileInputs.cache
+/Users/rerrek/Documents/csharp/terk/bin/Debug/net7.0/terk
+/Users/rerrek/Documents/csharp/terk/bin/Debug/net7.0/terk.deps.json
+/Users/rerrek/Documents/csharp/terk/bin/Debug/net7.0/terk.runtimeconfig.json
+/Users/rerrek/Documents/csharp/terk/bin/Debug/net7.0/terk.dll
+/Users/rerrek/Documents/csharp/terk/bin/Debug/net7.0/terk.pdb
+/Users/rerrek/Documents/csharp/terk/obj/Debug/net7.0/terk.dll
+/Users/rerrek/Documents/csharp/terk/obj/Debug/net7.0/refint/terk.dll
+/Users/rerrek/Documents/csharp/terk/obj/Debug/net7.0/terk.pdb
+/Users/rerrek/Documents/csharp/terk/obj/Debug/net7.0/terk.genruntimeconfig.cache
+/Users/rerrek/Documents/csharp/terk/obj/Debug/net7.0/ref/terk.dll
