@@ -17,37 +17,26 @@ typedef struct EnvItem {
     Color color;
 } EnvItem;
 
-// Module functions declaration
 void UpdatePlayer(Player *player, EnvItem *envItems, int envItemsLength, float delta);
 void UpdateCameraCenter(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float delta, int width, int height);
 void UpdateCameraCenterInsideMap(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float delta, int width, int height);
 void UpdateCameraCenterSmoothFollow(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float delta, int width, int height);
 void UpdateCameraEvenOutOnLanding(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float delta, int width, int height);
 void UpdateCameraPlayerBoundsPush(Camera2D *camera, Player *player, EnvItem *envItems, int envItemsLength, float delta, int width, int height);
+void ShowMainMenu(void);
 
-int main(void)
-{
-    // Initialization
-    const int screenWidth = 1200;
-    const int screenHeight = 1200;
-
-    // Load the player image
-    Texture2D playerImage = LoadTexture("./assets/jr2.png");
-    if (playerImage.id == 0)
-    {
-        TraceLog(LOG_ERROR, "Failed to load the player image");
-        UnloadTexture(playerImage);
-        CloseWindow();
-        return 1;
-    }
-
+int main(void) {
+    const int screenWidth = 800;
+    const int screenHeight = 450;
+    bool gameStarted = false; 
+    int score = 0;
+    double lastSecond = GetTime();
     InitWindow(screenWidth, screenHeight, "My_GeometryDash Rezki");
 
     Player player = { 0 };
     player.position = (Vector2){ 400, 280 };
     player.speed = 0;
     player.canJump = false;
-
     EnvItem envItems[] = {
         {{ 0, 0, 1000, 400 }, 0, LIGHTGRAY },
         {{ 0, 400, 1000, 200 }, 1, GRAY },
@@ -56,16 +45,15 @@ int main(void)
         {{ 650, 300, 100, 10 }, 1, GRAY }
     };
 
-    int envItemsLength = sizeof(envItems)/sizeof(envItems[0]);
+    int envItemsLength = sizeof(envItems) / sizeof(envItems[0]);
 
     Camera2D camera = { 0 };
     camera.target = player.position;
-    camera.offset = (Vector2){ screenWidth/2.0f, screenHeight/2.0f };
+    camera.offset = (Vector2){ screenWidth / 2.0f, screenHeight / 2.0f };
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
 
-    // Store pointers to the multiple update camera functions
-    void (*cameraUpdaters[])(Camera2D*, Player*, EnvItem*, int, float, int, int) = {
+    void (*cameraUpdaters[])(Camera2D *, Player *, EnvItem *, int, float, int, int) = {
         UpdateCameraCenter,
         UpdateCameraCenterInsideMap,
         UpdateCameraCenterSmoothFollow,
@@ -74,60 +62,62 @@ int main(void)
     };
 
     int cameraOption = 0;
-    int cameraUpdatersLength = sizeof(cameraUpdaters)/sizeof(cameraUpdaters[0]);
+    int cameraUpdatersLength = sizeof(cameraUpdaters) / sizeof(cameraUpdaters[0]);
 
     SetTargetFPS(60);
 
-    // Main game loop
-    while (!WindowShouldClose())
-    {
-        // Update
-        float deltaTime = GetFrameTime();
+    ShowMainMenu();
 
+    while (!WindowShouldClose()) {
+        
+        float deltaTime = GetFrameTime();
+        double currentSecond = GetTime();
+                if (currentSecond - lastSecond >= 1.0) {
+                    score += 10;
+                    lastSecond = currentSecond;
+                }
         UpdatePlayer(&player, envItems, envItemsLength, deltaTime);
 
-        camera.zoom += ((float)GetMouseWheelMove()*0.05f);
+        camera.zoom += ((float)GetMouseWheelMove() * 0.05f);
 
-        if (camera.zoom > 3.0f) camera.zoom = 3.0f;
-        else if (camera.zoom < 0.25f) camera.zoom = 0.25f;
+        if (camera.zoom > 3.0f)
+            camera.zoom = 3.0f;
+        else if (camera.zoom < 0.25f)
+            camera.zoom = 0.25f;
 
-        if (IsKeyPressed(KEY_R))
-        {
+        if (IsKeyPressed(KEY_R)) {
             camera.zoom = 1.0f;
             player.position = (Vector2){ 400, 280 };
         }
 
-        if (IsKeyPressed(KEY_C)) cameraOption = (2)%cameraUpdatersLength;
+        if (IsKeyPressed(KEY_C))
+            cameraOption = (2) % cameraUpdatersLength;
 
         cameraUpdaters[cameraOption](&camera, &player, envItems, envItemsLength, deltaTime, screenWidth, screenHeight);
 
-        // Draw
         BeginDrawing();
 
-            ClearBackground(LIGHTGRAY);
+        ClearBackground(LIGHTGRAY);
 
-            BeginMode2D(camera);
+        BeginMode2D(camera);
+        DrawText(TextFormat("Score: %d", score), 10, 10, 20, BLACK);
 
-                for (int i = 0; i < envItemsLength; i++) DrawRectangleRec(envItems[i].rect, envItems[i].color);
+        for (int i = 0; i < envItemsLength; i++)
+            DrawRectangleRec(envItems[i].rect, envItems[i].color);
 
-                // Draw the player image
-                DrawTexture(playerImage, player.position.x - playerImage.width / 2, player.position.y - playerImage.height / 2, WHITE);
+        Rectangle playerRect = { player.position.x - 20, player.position.y - 40, 40, 40 };
+        DrawRectangleRec(playerRect, RED);
 
-            EndMode2D();
+        EndMode2D();
 
         EndDrawing();
     }
 
-    // Unload the player image
-    UnloadTexture(playerImage);
-
-    // De-Initialization
     CloseWindow();
 
     return 0;
 }
 
-// ... (rest of your functions)
 
 void UpdatePlayer(Player *player, EnvItem *envItems, int envItemsLength, float delta)
 {
@@ -266,4 +256,20 @@ void UpdateCameraPlayerBoundsPush(Camera2D *camera, Player *player, EnvItem *env
     if (player->position.y < bboxWorldMin.y) camera->target.y = player->position.y;
     if (player->position.x > bboxWorldMax.x) camera->target.x = bboxWorldMin.x + (player->position.x - bboxWorldMax.x);
     if (player->position.y > bboxWorldMax.y) camera->target.y = bboxWorldMin.y + (player->position.y - bboxWorldMax.y);
+}
+
+void ShowMainMenu(void) {
+    while (!WindowShouldClose()) {
+        BeginDrawing();
+        ClearBackground(RAYWHITE);
+
+        DrawText("Geometry DashTest", GetScreenWidth() / 2 - MeasureText("Geometry DashTest", 30) / 2, 100, 30, BLACK);
+        DrawText("Press ENTER to start", GetScreenWidth() / 2 - MeasureText("Press ENTER to start", 20) / 2, 200, 20, DARKGRAY);
+        DrawText("By Rezki", GetScreenWidth() / 2 - MeasureText("By Rezki", 20) / 2, 400, 10, DARKGRAY);
+
+        EndDrawing();
+
+        if (IsKeyPressed(KEY_ENTER))
+            break;
+    }
 }
